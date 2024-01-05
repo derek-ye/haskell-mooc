@@ -143,11 +143,12 @@ powers k max = takeWhile (\n -> n <= max) [k^x | x <- [0,1..]]
 --       check ('A':xs) = False
 --       check _ = True
 --   in while check tail "xyzAvvt"
---     ==> Avvt
+--     ==> Avvts
 
 while :: (a->Bool) -> (a->a) -> a -> a
-while check update value = todo
-
+while check update value 
+    | check value == True = while check update (update value)
+    | otherwise = value
 ------------------------------------------------------------------------------
 -- Ex 8: another version of a while loop. This time, the check
 -- function returns an Either value. A Left value means stop, a Right
@@ -166,7 +167,10 @@ while check update value = todo
 -- Hint! Remember the case-of expression from lecture 2.
 
 whileRight :: (a -> Either b a) -> a -> b
-whileRight check x = todo
+whileRight check x = case result of
+  Left l -> l
+  Right r -> whileRight check r
+  where result = check x
 
 -- for the whileRight examples:
 -- step k x doubles x if it's less than k
@@ -190,7 +194,7 @@ bomb x = Right (x-1)
 -- Hint! This is a great use for list comprehensions
 
 joinToLength :: Int -> [String] -> [String]
-joinToLength = todo
+joinToLength n strList = [a ++ b | a <- strList, b <- strList, length (a ++ b) == n]
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the operator +|+ that returns a list with the first
@@ -203,8 +207,12 @@ joinToLength = todo
 --   [1,2,3] +|+ [4,5,6]  ==> [1,4]
 --   [] +|+ [True]        ==> [True]
 --   [] +|+ []            ==> []
-
-
+--  (+|+) (headA: _) (headB: _) = [headA, headB] -- why doesnt this work
+(+|+) :: [Int] -> [Int] -> [Int]
+[] +|+ [] = []
+[] +|+ (b:_) = [b]
+(a:_) +|+ [] = [a]
+listA +|+ listB = [head listA, head listB]
 ------------------------------------------------------------------------------
 -- Ex 11: remember the lectureParticipants example from Lecture 2? We
 -- used a value of type [Either String Int] to store some measurements
